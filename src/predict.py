@@ -1,13 +1,22 @@
 import pickle
 import pandas as pd
 from functools import lru_cache
+import os
 
 @lru_cache(maxsize=1)
 def load_models():
     """Load models once and cache them"""
-    model = pickle.load(open("models/churn.pkl", "rb"))
-    kmeans = pickle.load(open("models/segment.pkl", "rb"))
-    scaler = pickle.load(open("models/scaler.pkl", "rb"))
+    # Get the project root directory
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(current_dir)
+    
+    model_path = os.path.join(project_root, "models", "churn.pkl")
+    kmeans_path = os.path.join(project_root, "models", "segment.pkl")
+    scaler_path = os.path.join(project_root, "models", "scaler.pkl")
+    
+    model = pickle.load(open(model_path, "rb"))
+    kmeans = pickle.load(open(kmeans_path, "rb"))
+    scaler = pickle.load(open(scaler_path, "rb"))
     return model, kmeans, scaler
 
 model, kmeans, scaler = load_models()
