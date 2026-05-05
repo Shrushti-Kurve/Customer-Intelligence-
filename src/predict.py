@@ -1,8 +1,16 @@
 import pickle
+import pandas as pd
+from functools import lru_cache
 
-model = pickle.load(open("models/churn.pkl", "rb"))
-kmeans = pickle.load(open("models/segment.pkl", "rb"))
-scaler = pickle.load(open("models/scaler.pkl", "rb"))
+@lru_cache(maxsize=1)
+def load_models():
+    """Load models once and cache them"""
+    model = pickle.load(open("models/churn.pkl", "rb"))
+    kmeans = pickle.load(open("models/segment.pkl", "rb"))
+    scaler = pickle.load(open("models/scaler.pkl", "rb"))
+    return model, kmeans, scaler
+
+model, kmeans, scaler = load_models()
 
 def get_action(segment, churn):
     if churn == 1:
@@ -19,7 +27,11 @@ def predict(data):
     frequency = data["frequency"]
     monetary = data["monetary"]
 
-    X = [[recency, frequency, monetary]]
+    # Create DataFrame with proper feature names to match training data
+    X = pd.DataFrame(
+        [[recency, frequency, monetary]],
+        columns=["Recency", "Frequency", "Monetary"]
+    )
 
     scaled = scaler.transform(X)
 

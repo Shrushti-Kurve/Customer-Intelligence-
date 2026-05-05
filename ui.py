@@ -1,6 +1,12 @@
 import streamlit as st
 import pickle
 import os
+import sys
+import pandas as pd
+
+# Add src to path for imports
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
+from predict import predict
 
 st.set_page_config(
     page_title="Customer Intelligence Pro",
@@ -198,19 +204,19 @@ st.markdown('</div>', unsafe_allow_html=True)
 # Predict Button
 col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
 with col_btn2:
-    predict = st.button("⚡ PREDICT", use_container_width=True)
+    predict_btn = st.button("⚡ PREDICT", use_container_width=True)
 
-if predict:
+if predict_btn:
     try:
-        model = pickle.load(open("models/churn.pkl", "rb"))
-        kmeans = pickle.load(open("models/segment.pkl", "rb"))
-        scaler = pickle.load(open("models/scaler.pkl", "rb"))
-
-        X = [[recency, frequency, monetary]]
-        scaled = scaler.transform(X)
-        segment = int(kmeans.predict(scaled)[0])
-        churn = int(model.predict(X)[0])
-        action = get_action(segment, churn)
+        # Use the predict function from src/predict.py (with proper DataFrame feature names)
+        result = predict({
+            "recency": recency,
+            "frequency": frequency,
+            "monetary": monetary
+        })
+        segment = result["segment"]
+        churn = result["churn_risk"]
+        action = result["action"]
 
         st.markdown("<hr>", unsafe_allow_html=True)
         st.markdown("## 📈 PREDICTION RESULTS")
