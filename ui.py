@@ -1,9 +1,8 @@
 import streamlit as st
 import requests
+import os
 from datetime import datetime
-import json
 
-# Page configuration
 st.set_page_config(
     page_title="Customer Intelligence Pro",
     page_icon="🚀",
@@ -11,7 +10,8 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Advanced CSS with animations
+API_URL = os.getenv("API_URL", "http://127.0.0.1:8000")
+
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap');
@@ -25,7 +25,6 @@ st.markdown("""
         color: #ffffff;
     }
     
-    /* Animated Background */
     @keyframes gradient-shift {
         0% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
@@ -52,7 +51,6 @@ st.markdown("""
         50% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.8), 0 0 40px rgba(102, 126, 234, 0.4); }
     }
     
-    /* Header with Animation */
     .header-container {
         background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
         background-size: 400% 400%;
@@ -96,7 +94,6 @@ st.markdown("""
         letter-spacing: 0.5px;
     }
     
-    /* Input Section */
     .input-section {
         background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
         padding: 40px;
@@ -114,7 +111,6 @@ st.markdown("""
         margin-bottom: 25px !important;
     }
     
-    /* Input Fields */
     .stNumberInput input {
         background: rgba(255,255,255,0.05) !important;
         color: white !important;
@@ -137,7 +133,6 @@ st.markdown("""
         font-size: 16px !important;
     }
     
-    /* Buttons */
     .stButton button {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
         color: white !important;
@@ -163,7 +158,6 @@ st.markdown("""
         transform: translateY(-1px) !important;
     }
     
-    /* Result Cards */
     .result-card {
         background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(102, 126, 234, 0.05) 100%);
         padding: 30px;
@@ -176,7 +170,6 @@ st.markdown("""
         animation: float 3s ease-in-out infinite;
     }
     
-    /* Metric Cards with Styles */
     .metric-card-gold {
         background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
         animation: glow 2s ease-in-out infinite;
@@ -244,7 +237,6 @@ st.markdown("""
         margin-top: 8px !important;
     }
     
-    /* Action Card */
     .action-card {
         background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         padding: 40px;
@@ -275,7 +267,6 @@ st.markdown("""
         text-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
     
-    /* Titles */
     h1, h2 {
         color: #ffffff !important;
         text-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
@@ -293,7 +284,6 @@ st.markdown("""
         font-weight: 700 !important;
     }
     
-    /* Status Messages */
     .stSuccess, .stError, .stWarning, .stInfo {
         border-radius: 12px !important;
     }
@@ -308,12 +298,10 @@ st.markdown("""
         color: #ff6b6b !important;
     }
     
-    /* Spinner text */
     .stSpinner {
         color: #667eea !important;
     }
     
-    /* Separator */
     hr {
         border: 1px solid rgba(102, 126, 234, 0.2) !important;
         margin: 40px 0 !important;
@@ -321,7 +309,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Hidden sidebar
 st.markdown("""
 <style>
     [data-testid="stSidebarNav"] {
@@ -330,7 +317,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Animated Header
 st.markdown("""
 <div class="header-container">
     <h1>🚀 CUSTOMER INTELLIGENCE PRO</h1>
@@ -338,7 +324,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Input Section with Animation
 st.markdown('<div class="input-section">', unsafe_allow_html=True)
 st.markdown("### 📊 Enter Customer Metrics")
 
@@ -376,7 +361,6 @@ with col_c:
 
 st.markdown('</div>', unsafe_allow_html=True)
 
-# Prediction Button
 col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
 with col_btn2:
     predict_button = st.button(
@@ -385,7 +369,6 @@ with col_btn2:
         use_container_width=True
     )
 
-# Results Section
 if predict_button:
     with st.spinner("🔍 Processing data with AI..."):
         payload = {
@@ -395,7 +378,7 @@ if predict_button:
         }
 
         try:
-            response = requests.post("http://127.0.0.1:8000/predict", json=payload, timeout=5)
+            response = requests.post(f"{API_URL}/predict", json=payload, timeout=5)
 
             if response.status_code == 200:
                 data = response.json()
@@ -403,7 +386,6 @@ if predict_button:
                 st.markdown("<hr>", unsafe_allow_html=True)
                 st.markdown("<h2 style='text-align: center; margin-bottom: 40px;'>📈 ANALYSIS RESULTS</h2>", unsafe_allow_html=True)
                 
-                # Result Cards
                 res_col1, res_col2, res_col3 = st.columns(3, gap="large")
                 
                 segment = data["segment"]
@@ -449,7 +431,6 @@ if predict_button:
                     </div>
                     """, unsafe_allow_html=True)
                 
-                # Recommended Action
                 action = data["action"]
                 st.markdown(f"""
                 <div class="action-card">
@@ -458,7 +439,6 @@ if predict_button:
                 </div>
                 """, unsafe_allow_html=True)
                 
-                # Input Summary
                 st.markdown("<hr>", unsafe_allow_html=True)
                 st.markdown("<h2 style='text-align: center; margin-bottom: 30px;'>📋 INPUT SUMMARY</h2>", unsafe_allow_html=True)
                 
@@ -495,10 +475,10 @@ if predict_button:
                 
             else:
                 st.error(f"❌ API Error: {response.status_code}")
-                st.info("Ensure FastAPI backend is running: `uvicorn app:app --reload --port 8000`")
+                st.info("Set `API_URL` to your deployed FastAPI URL, or run the backend locally on port 8000.")
         
         except requests.exceptions.ConnectionError:
             st.error("❌ Cannot connect to API backend")
-            st.warning("Start the backend: `uvicorn app:app --reload --port 8000`")
+            st.warning("Check `API_URL` or start the backend locally on port 8000.")
         except Exception as e:
             st.error(f"❌ Error: {str(e)}")
